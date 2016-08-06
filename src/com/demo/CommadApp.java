@@ -4,11 +4,17 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Scanner;
 import java.util.Set;
 
-public class CommanApp {
+/**
+ * ce.mnpatel@gmail.com 331-248-2055
+ * 
+ * @author Maharshi
+ * 
+ */
+
+public class CommadApp {
 	static HashMap<String, ArrayList<String>> installDependencyMap = new HashMap<>();
 	static Set<String> listComponent = new LinkedHashSet<>();
 	static HashMap<String, ArrayList<String>> removeDependencyMap = new HashMap<>();
@@ -36,30 +42,34 @@ public class CommanApp {
 
 	private static void initList(String cmd) {
 		System.out.println(cmd);
-		for(String component : listComponent){
-			System.out.println("\t"+component);
+		for (String component : listComponent) {
+			System.out.println("\t" + component);
 		}
 	}
 
 	private static void initRemove(String cmd) {
 		System.out.println(cmd);
 		String parameter = extractParameterFromCmd(cmd)[0];
-		remove(parameter);
-		
+		remove(parameter, true);
+
 	}
-	
-	private static void remove(String parameter) {
-//		if()
-//		if (removeDependencyMap.containsKey(parameter)) {
-//			ArrayList<String> list = removeDependencyMap.get(parameter);
-//			if (!list.isEmpty()) {
-//				for (String component : list) {
-//					remove(component);
-//				}
-//			}else{
-//				System.out.println("\tRemoving " + parameter);		
-//			}
-//		}
+
+	private static void remove(String parameter, boolean print) {
+		if(removeDependencyMap.containsKey(parameter)){
+			ArrayList<String> listComponent = removeDependencyMap.get(parameter);
+			if(listComponent.isEmpty()){
+				System.out.println("\tRemoving " + parameter);
+				listComponent.remove(parameter);
+				if(installDependencyMap.containsKey(parameter)){
+					for(String child : installDependencyMap.get(parameter)){
+						remove(child, false);
+					}
+				}
+			}else{
+				if(print)
+				System.out.println("\t" + parameter+" is still needed");
+			}
+		}
 	}
 	
 	private static void initInstall(String cmd) {
@@ -70,8 +80,8 @@ public class CommanApp {
 	}
 
 	private static void install(String parameter) {
-		if(listComponent.contains(parameter)){
-			System.out.println("\t"+parameter+" is Already Installed ");
+		if (listComponent.contains(parameter)) {
+			System.out.println("\t" + parameter + " is Already Installed ");
 			return;
 		}
 		if (installDependencyMap.containsKey(parameter)) {
@@ -99,7 +109,7 @@ public class CommanApp {
 					componentList.add(parameters[i + 1]);
 			}
 		}
-		for (int i = parameters.length-1; i >= 0; i--) {
+		for (int i = parameters.length - 1; i >= 0; i--) {
 			String key = parameters[i];
 			if (!removeDependencyMap.containsKey(key))
 				removeDependencyMap.put(key, new ArrayList<String>());
@@ -109,7 +119,7 @@ public class CommanApp {
 					componentList.add(parameters[i - 1]);
 			}
 		}
-		
+
 	}
 
 	public static String[] extractParameterFromCmd(String cmd) {
